@@ -1,0 +1,1 @@
+- [WebGL preview support](webgl-preview-support.md) — the preview browser may not provide WebGL; interactive 3D views need a graceful non-WebGL fallback.
