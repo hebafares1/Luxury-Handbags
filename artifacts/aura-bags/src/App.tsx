@@ -213,7 +213,7 @@ function App() {
     <>
       <header className="nav-shell">
         <div className="nav-inner">
-          <a href="#home" className="brand-mark" aria-label="AURA home">AURA</a>
+          <a href="#home" className="brand-mark" aria-label="ROSE home">ROSE</a>
           <nav className="nav-links" aria-label="Main navigation">
             <a href="#home">Home</a>
             <a href="#collection">Collection</a>
@@ -279,7 +279,7 @@ function App() {
                 aria-label="Drag to rotate handbag"
               >
                 <ViewerBag color={swatch.color} rotation={rotation} />
-                <div className="stage-caption">AURA / {selected.name.replace('The ', '')}</div>
+                <div className="stage-caption">ROSE / {selected.name.replace('The ', '')}</div>
                 <div className="stage-controls">
                   <button className="round-control" onClick={() => rotateBy(-28)} aria-label="Rotate left"><ArrowLeft size={15} /></button>
                   <button className="round-control" onClick={() => setPlaying((value) => !value)} aria-label={playing ? 'Pause auto rotation' : 'Play auto rotation'}>{playing ? <Pause size={14} /> : <Play size={14} />}</button>
