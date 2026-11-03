@@ -1,1 +1,1 @@
-- [WebGL preview support](webgl-preview-support.md) — the preview browser may not provide WebGL; interactive 3D views need a graceful non-WebGL fallback.
+- [Product photo fidelity](product-photo-fidelity.md) — viewer imagery must remain identical to the corresponding collection photo, never drawn or recolored.
