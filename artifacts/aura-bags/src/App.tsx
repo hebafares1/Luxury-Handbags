@@ -117,7 +117,7 @@ function App() {
           <div className="section-wrap">
             <div className="viewer-heading reveal">
               <div><div className="eyebrow">A closer look</div><h2 className="serif">See It From<br />Every Angle</h2></div>
-              <div className="viewer-label">Drag to tilt</div>
+              <div className="viewer-label">Drag to rotate</div>
             </div>
             <div className="viewer-panel reveal">
               <ProductImageViewer key={selected.id} product={selected} />

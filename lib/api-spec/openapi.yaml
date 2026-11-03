@@ -11,6 +11,37 @@ tags:
   - name: health
     description: Health operations
 paths:
+  /assets/products/{bag}/{frame}:
+    get:
+      operationId: getProductFrame
+      summary: Serve a public product turntable frame
+      servers:
+        - url: /
+      parameters:
+        - name: bag
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [the-sloane, the-solenne, the-marais, the-no-8, the-alba, the-liora]
+        - name: frame
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^(0[1-9]|1[0-9]|2[0-4])\.jpg$'
+      responses:
+        "200":
+          description: Product turntable JPEG
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Frame not found
+        "503":
+          description: Asset storage temporarily unavailable
   /healthz:
     get:
       operationId: healthCheck

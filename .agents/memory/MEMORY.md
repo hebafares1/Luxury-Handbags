@@ -1,1 +1,1 @@
-- [Product photo fidelity](product-photo-fidelity.md) — viewer imagery must remain identical to the corresponding collection photo, never drawn or recolored.
+- [Product photo fidelity](product-photo-fidelity.md) — original collection photo stays frame 01; AI-approximated rotation views are approved, but recoloring is not.
