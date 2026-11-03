@@ -1,0 +1,44 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "djORiyCQgr5AEYQAnuAsx"
+uri = "file://generated-artifacts/sloane-samples/02-15deg.jpg"
+type = "image"
+title = "The Sloane — 15° AI sample"
+description = "Reference-based approximation. Includes changes to the setting and some product details; not approved for the live viewer."
+logical_id = "78a0beb7-4587-4168-a664-33218066ec42"
+content_hash = "sha256:bcf0fac6837517304e06b82f2b529ca128a99c1af278d55343888c78a588578c"
+size = 109385
+mtime_ms = 1793666053848
+storage_uri = "gcs://replit-rams-assets-pike/rams/assets/repl:b931845e-3ca2-4e87-ab13-8400a9756a53/78a0beb7-4587-4168-a664-33218066ec42/b86f79ef-3eb3-4663-96ab-ca01f3e7dec6"
+storage_version_token = "1793666084858797"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "7XQDR1X4jiOf0qZiyX4cH"
+uri = "file://generated-artifacts/sloane-samples/07-90deg.jpg"
+type = "image"
+title = "The Sloane — side AI sample"
+description = "AI-inferred side view from the original front photograph. The unseen construction cannot be verified."
+logical_id = "a13520df-83fe-4941-aeb3-3aa80232fd12"
+content_hash = "sha256:be1b41a51ca48e7827568c1f773d5c085f4cd80f34c69de88954e2c551fa64b4"
+size = 53799
+mtime_ms = 1793666051860
+storage_uri = "gcs://replit-rams-assets-pike/rams/assets/repl:b931845e-3ca2-4e87-ab13-8400a9756a53/a13520df-83fe-4941-aeb3-3aa80232fd12/b13af529-4828-4334-8ed8-0696047c884f"
+storage_version_token = "1793666086131417"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "3gzrqNVWv4MG7XDaYA6CW"
+uri = "file://generated-artifacts/sloane-samples/13-180deg.jpg"
+type = "image"
+title = "The Sloane — back AI sample"
+description = "AI-inferred back view from the original front photograph. The back panel is an approximation, not a verified product view."
+logical_id = "b6a16a1b-d51b-46c5-8b7a-baff40145e56"
+content_hash = "sha256:e84c0cc79f02f706a80c9c46a10a4a01c41e3f9812b0d6e46882e82950b09eec"
+size = 105829
+mtime_ms = 1793666054060
+storage_uri = "gcs://replit-rams-assets-pike/rams/assets/repl:b931845e-3ca2-4e87-ab13-8400a9756a53/b6a16a1b-d51b-46c5-8b7a-baff40145e56/a5489665-00a7-401c-ae09-aadcb681e636"
+storage_version_token = "1793666087396322"
+content_type = "image/jpeg"
