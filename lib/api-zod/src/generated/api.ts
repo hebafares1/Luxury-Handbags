@@ -23,6 +23,23 @@ export const GetProductFrameResponse = zod.unknown()
 
 
 /**
+ * @summary List products in the ROSE storefront
+ */
+export const GetProductsResponseItem = zod.object({
+  "id": zod.number().int(),
+  "slug": zod.string(),
+  "name": zod.string(),
+  "description": zod.string(),
+  "price": zod.number(),
+  "image": zod.string(),
+  "category": zod.string(),
+  "turntableSlug": zod.string(),
+  "sortOrder": zod.number().int()
+})
+export const GetProductsResponse = zod.array(GetProductsResponseItem)
+
+
+/**
  * Returns server health status
  * @summary Health check
  */

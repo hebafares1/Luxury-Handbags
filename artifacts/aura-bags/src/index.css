@@ -48,6 +48,10 @@ button { font: inherit; }
 .section-heading h2,.viewer-heading h2 { font:400 clamp(38px,5.2vw,64px)/1.03 'Playfair Display',serif; letter-spacing:-.045em; margin:0; }
 .section-heading .subtle { font-size:10px; letter-spacing:.17em; color:var(--muted); text-transform:uppercase; padding-bottom:8px; }
 .product-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:54px 25px; }
+.collection-status { grid-column:1/-1; min-height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center; color:var(--muted); font-size:11px; letter-spacing:.08em; }
+.collection-status button { border:1px solid var(--line); background:transparent; padding:11px 16px; color:var(--ink); font-size:9px; letter-spacing:.13em; text-transform:uppercase; cursor:pointer; }
+.collection-status button:hover { background:var(--ink); color:var(--cream); }
+.viewer-status { grid-column:1/-1; min-height:470px; display:grid; place-items:center; color:var(--muted); font-size:11px; letter-spacing:.08em; }
 .product-card { min-width:0; position:relative; transition:transform .4s cubic-bezier(.2,.7,.2,1); }
 .product-card:hover { transform:translateY(-7px); }
 .product-image-wrap { position:relative; overflow:hidden; background:#eee5da; aspect-ratio: .79; }

@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ArrowUpRight, Heart, Plus, ShoppingBag, X } from 'lucide-react';
-import { products, type Product } from '@/data/products';
+import { getProducts } from '@workspace/api-client-react';
+import { mapStoreProduct, type Product } from '@/data/products';
 import { ProductImageViewer } from '@/components/ProductImageViewer';
 
 type CartItem = { key: number; id: number; name: string; price: number };
@@ -19,10 +20,27 @@ function App() {
   const [favorites, setFavorites] = useState<number[]>(() => readStorage('aura-favorites', []));
   const [cart, setCart] = useState<CartItem[]>(() => readStorage('aura-cart', []));
   const [cartOpen, setCartOpen] = useState(false);
-  const [selected, setSelected] = useState<Product>(products[0]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [selected, setSelected] = useState<Product | null>(null);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [productsError, setProductsError] = useState(false);
 
   useEffect(() => { localStorage.setItem('aura-favorites', JSON.stringify(favorites)); }, [favorites]);
   useEffect(() => { localStorage.setItem('aura-cart', JSON.stringify(cart)); }, [cart]);
+  const loadProducts = useCallback(async () => {
+    setProductsLoading(true);
+    setProductsError(false);
+    try {
+      const items = (await getProducts()).map(mapStoreProduct);
+      setProducts(items);
+      setSelected((current) => items.find((item) => item.id === current?.id) ?? items[0] ?? null);
+    } catch {
+      setProductsError(true);
+    } finally {
+      setProductsLoading(false);
+    }
+  }, []);
+  useEffect(() => { void loadProducts(); }, [loadProducts]);
   useEffect(() => {
     const items = document.querySelectorAll<HTMLElement>('.reveal');
     if (!('IntersectionObserver' in window)) {
@@ -39,7 +57,7 @@ function App() {
     }, { threshold: .12 });
     items.forEach((item) => observer.observe(item));
     return () => observer.disconnect();
-  }, []);
+  }, [products.length]);
   useEffect(() => {
     const keyHandler = (event: KeyboardEvent) => { if (event.key === 'Escape') setCartOpen(false); };
     window.addEventListener('keydown', keyHandler);
@@ -89,26 +107,35 @@ function App() {
               <h2 className="serif">Our Collection</h2>
             </div>
             <div className="product-grid">
-              {products.map((product, index) => (
-                <article className="product-card reveal" key={product.id} onClick={() => chooseProduct(product)} style={{ transitionDelay: `${(index % 3) * 80}ms` }}>
-                  <div className="product-image-wrap">
-                    <button type="button" className="product-preview" aria-label={`View ${product.name}`}>
-                      <img className="product-image" src={product.image} alt={product.name} />
-                    </button>
-                    <button
-                      className={`favorite ${favorites.includes(product.id) ? 'is-loved' : ''}`}
-                      onClick={(event) => { event.stopPropagation(); toggleFavorite(product.id); }}
-                      aria-label={favorites.includes(product.id) ? `Remove ${product.name} from favorites` : `Add ${product.name} to favorites`}
-                      aria-pressed={favorites.includes(product.id)}
-                    ><Heart size={17} fill={favorites.includes(product.id) ? 'currentColor' : 'none'} strokeWidth={1.5} /></button>
-                  </div>
-                  <div className="product-meta">
-                    <span className="product-name">{product.name}</span>
-                    <span className="product-price">{money(product.price)}</span>
-                  </div>
-                  <button className="add-button" onClick={(event) => { event.stopPropagation(); addToCart(product); }}>Add to Cart <Plus size={14} strokeWidth={1.4} /></button>
-                </article>
-              ))}
+              {productsLoading ? (
+                <div className="collection-status" role="status">Loading the collection…</div>
+              ) : productsError ? (
+                <div className="collection-status" role="alert">
+                  <span>We couldn’t load the collection.</span>
+                  <button type="button" onClick={() => void loadProducts()}>Try again</button>
+                </div>
+              ) : products.length === 0 ? (
+                <div className="collection-status" role="status">The collection is currently empty.</div>
+              ) : products.map((product, index) => (
+                  <article className="product-card reveal" key={product.id} onClick={() => chooseProduct(product)} style={{ transitionDelay: `${(index % 3) * 80}ms` }}>
+                    <div className="product-image-wrap">
+                      <button type="button" className="product-preview" aria-label={`View ${product.name}`}>
+                        <img className="product-image" src={product.image} alt={product.name} />
+                      </button>
+                      <button
+                        className={`favorite ${favorites.includes(product.id) ? 'is-loved' : ''}`}
+                        onClick={(event) => { event.stopPropagation(); toggleFavorite(product.id); }}
+                        aria-label={favorites.includes(product.id) ? `Remove ${product.name} from favorites` : `Add ${product.name} to favorites`}
+                        aria-pressed={favorites.includes(product.id)}
+                      ><Heart size={17} fill={favorites.includes(product.id) ? 'currentColor' : 'none'} strokeWidth={1.5} /></button>
+                    </div>
+                    <div className="product-meta">
+                      <span className="product-name">{product.name}</span>
+                      <span className="product-price">{money(product.price)}</span>
+                    </div>
+                    <button className="add-button" onClick={(event) => { event.stopPropagation(); addToCart(product); }}>Add to Cart <Plus size={14} strokeWidth={1.4} /></button>
+                  </article>
+                ))}
             </div>
           </div>
         </section>
@@ -120,13 +147,21 @@ function App() {
               <div className="viewer-label">Drag to rotate</div>
             </div>
             <div className="viewer-panel reveal">
-              <ProductImageViewer key={selected.id} product={selected} />
-              <aside className="viewer-details">
-                <span className="detail-kicker">Selected piece</span>
-                <h3>{selected.name}</h3>
-                <span className="price">{money(selected.price)}</span>
-                <button className="viewer-add" onClick={() => addToCart(selected)}>Add to Cart <Plus size={15} /></button>
-              </aside>
+              {selected ? (
+                <>
+                  <ProductImageViewer key={selected.id} product={selected} />
+                  <aside className="viewer-details">
+                    <span className="detail-kicker">Selected piece</span>
+                    <h3>{selected.name}</h3>
+                    <span className="price">{money(selected.price)}</span>
+                    <button className="viewer-add" onClick={() => addToCart(selected)}>Add to Cart <Plus size={15} /></button>
+                  </aside>
+                </>
+              ) : (
+                <div className="viewer-status" role={productsError ? 'alert' : 'status'}>
+                  {productsLoading ? 'Loading the collection…' : productsError ? 'Product details are unavailable.' : 'No products to display.'}
+                </div>
+              )}
             </div>
           </div>
         </section>

@@ -9,3 +9,17 @@ export interface HealthStatus {
   status: string;
 }
 
+export interface StoreProduct {
+  id: number;
+  slug: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  turntableSlug: string;
+  sortOrder: number;
+}
+
+export type StoreProductList = StoreProduct[];
+
