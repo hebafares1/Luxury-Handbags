@@ -3,6 +3,7 @@ import { ArrowDown, ArrowUpRight, Check, Heart, Plus, ShoppingBag, X } from 'luc
 import { getProducts } from '@workspace/api-client-react';
 import { mapStoreProduct, type Product } from '@/data/products';
 import { ProductImageViewer } from '@/components/ProductImageViewer';
+import { HeroScrub } from '@/components/HeroScrub';
 import { convertUsdToKwd, formatStorePrice } from '@/lib/currency';
 
 type CartItem = { key: number; id: number; name: string; price: number };
@@ -54,6 +55,7 @@ function App() {
   const visibleProducts = activeCategory === 'All pieces'
     ? products
     : products.filter((product) => product.category === activeCategory);
+  const heroProduct = products.find((product) => product.name === 'The Sloane');
 
   useEffect(() => { localStorage.setItem('aura-favorites', JSON.stringify(favorites)); }, [favorites]);
   useEffect(() => {
@@ -131,7 +133,7 @@ function App() {
 
       <main>
         <section className="hero" id="home">
-          <div className="hero-image" aria-hidden="true" />
+          {heroProduct && <HeroScrub product={heroProduct} />}
           <div className="hero-content">
             <div className="eyebrow">The ROSE collection · A study in everyday</div>
             <h1>Carry<br /><em>Your Story</em></h1>
