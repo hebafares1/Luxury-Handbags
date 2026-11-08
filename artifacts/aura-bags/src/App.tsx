@@ -141,46 +141,6 @@ function App() {
           <div className="hero-index"><span className="hero-caption">A distinct point of view</span><span /> ROSE / 01</div>
         </section>
 
-        {!productsLoading && !productsError && products.length > 0 && (
-          <section className="edits-section" id="edits" aria-labelledby="edits-title">
-            <div className="section-wrap">
-              <div className="edits-heading reveal">
-                <div>
-                  <div className="eyebrow">Find your shape</div>
-                  <h2 className="serif" id="edits-title">The collections<span className="heading-period">.</span></h2>
-                </div>
-                <p>Different silhouettes, one unmistakable point of view.</p>
-              </div>
-              <div className="edits-grid">
-                {categories.slice(1).map((category, index) => {
-                  const featuredProduct = products.find((product) => product.category === category);
-                  if (!featuredProduct) return null;
-                  return (
-                    <button
-                      type="button"
-                      key={category}
-                      className="edit-card reveal"
-                      onClick={() => {
-                        setActiveCategory(category);
-                        scrollToSection('#collection');
-                      }}
-                      style={{ transitionDelay: `${index * 70}ms` }}
-                      data-testid={`button-edit-${category.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
-                    >
-                      <span className="edit-image-wrap">
-                        <img className="edit-image" src={featuredProduct.image} alt={featuredProduct.name} />
-                        <span className="edit-arrow" aria-hidden="true"><ArrowUpRight size={16} /></span>
-                      </span>
-                      <span className="edit-category">{category}</span>
-                      <span className="edit-description">{featuredProduct.description}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-        )}
-
         <section className="collection-section" id="collection">
           <div className="section-wrap">
             <div className="section-heading reveal">

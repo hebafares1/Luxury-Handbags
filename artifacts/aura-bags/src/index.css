@@ -344,36 +344,3 @@ html { scroll-padding-top: 90px; }
  .hero-image { animation:none; transform:none; }
  .hero-content { animation:none; }
 }
-
-.edits-section { padding:105px 0 116px; background:#e9e2d8; }
-.edits-heading { display:flex; justify-content:space-between; align-items:flex-end; gap:28px; margin-bottom:36px; }
-.edits-heading .eyebrow { margin-bottom:16px; }
-.edits-heading h2 { margin:0; font:400 clamp(42px,5.2vw,68px)/1.03 'Playfair Display',serif; letter-spacing:-.05em; }
-.edits-heading p { max-width:250px; margin:0 0 6px; color:#716b62; font-size:11px; line-height:1.75; }
-.edits-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:18px; }
-.edit-card { display:block; min-width:0; padding:0; border:0; background:transparent; color:var(--ink); text-align:left; cursor:pointer; }
-.edit-card:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
-.edit-image-wrap { display:block; position:relative; overflow:hidden; aspect-ratio:.81; background:#ded6ca; }
-.edit-image { display:block; width:100%; height:100%; object-fit:cover; transition:transform .8s cubic-bezier(.2,.7,.2,1); }
-.edit-card:hover .edit-image { transform:scale(1.045); }
-.edit-arrow { position:absolute; right:12px; bottom:12px; display:grid; place-items:center; width:34px; height:34px; background:#f3eee6; color:var(--ink); transition:transform .25s,background .25s,color .25s; }
-.edit-card:hover .edit-arrow { transform:translate(2px,-2px); background:var(--ink); color:var(--cream); }
-.edit-category { display:block; margin-top:15px; font:400 19px 'Playfair Display',serif; }
-.edit-description { display:block; min-height:32px; margin-top:7px; color:#756f66; font-size:10px; line-height:1.55; }
-@media(max-width:850px) {
-  .edits-section { padding:88px 0 96px; }
-  .edits-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
-}
-@media(max-width:600px) {
-  .edits-section { padding:75px 0 84px; }
-  .edits-heading { display:block; margin-bottom:25px; }
-  .edits-heading .eyebrow { margin-bottom:13px; }
-  .edits-heading p { margin:13px 0 0; font-size:10px; }
-  .edits-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px 12px; }
-  .edit-image-wrap { aspect-ratio:.73; }
-  .edit-category { margin-top:10px; font-size:17px; }
-  .edit-description { font-size:9px; }
-}
-@media(prefers-reduced-motion:reduce) {
-  .edit-image,.edit-arrow { transition:none; }
-}
