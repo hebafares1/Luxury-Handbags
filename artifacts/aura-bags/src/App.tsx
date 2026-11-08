@@ -151,7 +151,7 @@ function Storefront() {
             <p>ROSE is for the pieces you reach for without thinking—and still feel something when you do. Distinctive by design, made to find its place in your own everyday.</p>
             <a href="#collection" className="story-link" data-testid="link-story-discover">Find your ROSE <ArrowDown size={15} /></a>
           </div>
-          <div className="story-note"><span>01 / 03</span><span>Style is personal.<br />Carry it that way.</span></div>
+          <div className="story-note"><span>Style is personal.<br />Carry it that way.</span></div>
         </section>
 
         <section className="viewer-section" id="viewer">
