@@ -460,10 +460,11 @@ html { scroll-padding-top: 90px; }
   position:absolute;
   inset:0;
   background:linear-gradient(
-    90deg,
-    rgba(246,240,233,.62) 0%,
-    rgba(246,240,233,.44) 42%,
-    rgba(246,240,233,.28) 100%
+    180deg,
+    rgba(246,240,233,.72) 0%,
+    rgba(246,240,233,.46) 28%,
+    rgba(246,240,233,.16) 55%,
+    rgba(246,240,233,0) 74%
   );
   pointer-events:none;
 }
