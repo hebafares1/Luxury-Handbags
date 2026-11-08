@@ -1,74 +1,38 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowDown, ArrowUpRight, Check, Heart, Plus, ShoppingBag, X } from 'lucide-react';
+import { ArrowDown, ArrowUpRight, Plus } from 'lucide-react';
 import { getProducts } from '@workspace/api-client-react';
-import { Link, Route, Switch } from 'wouter';
-import { AuthProvider, useAuth } from '@/auth/AuthContext';
+import { Route, Switch } from 'wouter';
+import { AuthProvider } from '@/auth/AuthContext';
+import { CartProvider, useCart } from '@/cart/CartContext';
+import { FavoritesProvider, useFavorites } from '@/favorites/FavoritesContext';
 import { LoginPage, SignUpPage } from '@/pages/auth';
+import FavoritesPage from '@/pages/favorites';
 import NotFound from '@/pages/not-found';
+import { CartDrawer, StoreFooter, StoreHeader } from '@/components/StoreChrome';
+import { ProductCard } from '@/components/ProductCard';
 import { Toaster } from '@/components/ui/toaster';
 import { mapStoreProduct, type Product } from '@/data/products';
 import { ProductImageViewer } from '@/components/ProductImageViewer';
 import { HeroBackdrop } from '@/components/HeroBackdrop';
-import { convertUsdToKwd, formatStorePrice } from '@/lib/currency';
-import { supabaseClient } from '@/lib/supabase';
+import { formatStorePrice } from '@/lib/currency';
 import { useToast } from '@/hooks/use-toast';
 
-type CartItem = { key: number; id: number; name: string; price: number };
-type StoredCart = { currency: 'KWD'; items: CartItem[] };
 const money = formatStorePrice;
 
-function readStorage<T,>(key: string, fallback: T): T {
-  try {
-    const value = localStorage.getItem(key);
-    return value ? JSON.parse(value) as T : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function readCart(): CartItem[] {
-  const stored = readStorage<unknown>('aura-cart', []);
-  if (Array.isArray(stored)) {
-    return (stored as CartItem[]).map((item) => ({
-      ...item,
-      price: convertUsdToKwd(item.price),
-    }));
-  }
-  if (
-    typeof stored === 'object' &&
-    stored !== null &&
-    'currency' in stored &&
-    stored.currency === 'KWD' &&
-    'items' in stored &&
-    Array.isArray(stored.items)
-  ) {
-    return stored.items as CartItem[];
-  }
-  return [];
-}
-
 function Storefront() {
-  const [favorites, setFavorites] = useState<number[]>(() => readStorage('aura-favorites', []));
-  const [cart, setCart] = useState<CartItem[]>(readCart);
-  const [cartOpen, setCartOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [selected, setSelected] = useState<Product | null>(null);
   const [productsLoading, setProductsLoading] = useState(true);
   const [productsError, setProductsError] = useState(false);
   const [activeCategory, setActiveCategory] = useState('All pieces');
-  const [cartAnnouncement, setCartAnnouncement] = useState('');
-  const { user, loading: authLoading } = useAuth();
+  const { favoriteIds, pendingIds, toggleFavorite } = useFavorites();
+  const { addToCart } = useCart();
   const { toast } = useToast();
 
   const categories = ['All pieces', ...new Set(products.map((product) => product.category).filter(Boolean))];
   const visibleProducts = activeCategory === 'All pieces'
     ? products
     : products.filter((product) => product.category === activeCategory);
-  useEffect(() => { localStorage.setItem('aura-favorites', JSON.stringify(favorites)); }, [favorites]);
-  useEffect(() => {
-    const storedCart: StoredCart = { currency: 'KWD', items: cart };
-    localStorage.setItem('aura-cart', JSON.stringify(storedCart));
-  }, [cart]);
   const loadProducts = useCallback(async () => {
     setProductsLoading(true);
     setProductsError(false);
@@ -100,16 +64,16 @@ function Storefront() {
     items.forEach((item) => observer.observe(item));
     return () => observer.disconnect();
   }, [products.length, activeCategory, productsLoading, productsError]);
-  useEffect(() => {
-    const keyHandler = (event: KeyboardEvent) => { if (event.key === 'Escape') setCartOpen(false); };
-    window.addEventListener('keydown', keyHandler);
-    return () => window.removeEventListener('keydown', keyHandler);
-  }, []);
-
-  const addToCart = (product: Product) => {
-    setCart((items) => [...items, { key: Date.now() + Math.random(), id: product.id, name: product.name, price: product.price }]);
-    setCartAnnouncement(`${product.name} added to your bag`);
-    setCartOpen(true);
+  const handleToggleFavorite = async (id: number) => {
+    try {
+      await toggleFavorite(id);
+    } catch (error) {
+      toast({
+        title: 'Sign in to save favorites',
+        description: error instanceof Error ? error.message : 'Please log in to save a piece.',
+        variant: 'destructive',
+      });
+    }
   };
   const scrollToSection = (selector: string) => {
     const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
@@ -119,61 +83,10 @@ function Storefront() {
     setSelected(product);
     scrollToSection('#viewer');
   };
-  const toggleFavorite = (id: number) => setFavorites((items) => items.includes(id) ? items.filter((item) => item !== id) : [...items, id]);
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
-  const signOut = async () => {
-    if (!supabaseClient) {
-      toast({
-        title: 'Unable to sign out',
-        description: 'Authentication is not configured.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    try {
-      const { error } = await supabaseClient.auth.signOut();
-      if (error) throw error;
-      toast({ title: 'Signed out', description: 'You have been signed out of ROSE.' });
-    } catch (error) {
-      toast({
-        title: 'Unable to sign out',
-        description: error instanceof Error ? error.message : 'Please try again.',
-        variant: 'destructive',
-      });
-    }
-  };
 
   return (
     <>
-      <header className="nav-shell">
-        <div className="nav-inner">
-          <a href="#home" className="brand-mark" aria-label="ROSE home" data-testid="link-home">ROSE</a>
-          <nav className="nav-links" aria-label="Main navigation">
-            <a href="#home" data-testid="link-nav-home">Home</a>
-            <a href="#collection" data-testid="link-nav-collection">Collection</a>
-            <a href="#contact" data-testid="link-nav-contact">Contact</a>
-          </nav>
-          <div className="nav-actions">
-            {authLoading ? (
-              <span className="nav-auth-placeholder" aria-hidden="true" />
-            ) : user?.email ? (
-              <div className="nav-user-controls">
-                <span className="nav-user-email" title={user.email} data-testid="text-user-email">{user.email}</span>
-                <button className="nav-auth-link nav-logout" type="button" onClick={() => void signOut()} data-testid="button-auth-logout">Log out</button>
-              </div>
-            ) : (
-              <div className="nav-auth-links">
-                <Link href="/login" className="nav-auth-link" data-testid="link-login">Log in</Link>
-                <Link href="/signup" className="nav-auth-link" data-testid="link-signup">Sign up</Link>
-              </div>
-            )}
-            <button className="nav-cart" onClick={() => setCartOpen(true)} aria-label={`Open cart, ${cart.length} items`} data-testid="button-open-cart">
-              <ShoppingBag size={18} strokeWidth={1.5} /><span>Bag</span><span className="cart-count">{cart.length}</span>
-            </button>
-          </div>
-        </div>
-      </header>
+      <StoreHeader />
 
       <main>
         <section className="hero" id="home">
@@ -215,27 +128,17 @@ function Storefront() {
               ) : visibleProducts.length === 0 ? (
                 <div className="collection-status" role="status">No pieces in this edit yet.</div>
               ) : visibleProducts.map((product, index) => (
-                  <article className="product-card reveal" key={product.id} onClick={() => chooseProduct(product)} style={{ transitionDelay: `${(index % 3) * 80}ms` }} data-testid={`card-product-${product.id}`}>
-                    <div className="product-image-wrap">
-                      <button type="button" className="product-preview" aria-label={`View ${product.name}`} onClick={(event) => { event.stopPropagation(); chooseProduct(product); }} data-testid={`button-view-product-${product.id}`}>
-                        <img className="product-image" src={product.image} alt={product.name} />
-                      </button>
-                      <button
-                        className={`favorite ${favorites.includes(product.id) ? 'is-loved' : ''}`}
-                        onClick={(event) => { event.stopPropagation(); toggleFavorite(product.id); }}
-                        aria-label={favorites.includes(product.id) ? `Remove ${product.name} from favorites` : `Add ${product.name} to favorites`}
-                        aria-pressed={favorites.includes(product.id)}
-                        data-testid={`button-favorite-${product.id}`}
-                      ><Heart size={17} fill={favorites.includes(product.id) ? 'currentColor' : 'none'} strokeWidth={1.5} /></button>
-                    </div>
-                    <div className="product-meta">
-                      <span className="product-name" data-testid={`text-product-name-${product.id}`}>{product.name}</span>
-                      <span className="product-price" data-testid={`text-product-price-${product.id}`}>{money(product.price)}</span>
-                    </div>
-                    <p className="product-description">{product.description}</p>
-                    <button className="add-button" onClick={(event) => { event.stopPropagation(); addToCart(product); }} data-testid={`button-add-product-${product.id}`}>Add to Bag <Plus size={14} strokeWidth={1.4} /></button>
-                  </article>
-                ))}
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  favorite={favoriteIds.includes(product.id)}
+                  favoritePending={pendingIds.includes(product.id)}
+                  index={index}
+                  onToggleFavorite={(id) => void handleToggleFavorite(id)}
+                  onChoose={chooseProduct}
+                  onAddToCart={addToCart}
+                />
+              ))}
             </div>
           </div>
         </section>
@@ -278,27 +181,7 @@ function Storefront() {
         </section>
       </main>
 
-      <footer className="contact-footer" id="contact">
-        <a className="footer-brand" href="#home" data-testid="link-footer-home">ROSE</a>
-        <span className="footer-note">Carry what feels like you.</span>
-        <a href="mailto:rose-bags@gmail.com" data-testid="link-contact">Contact Us</a>
-        <a className="email" href="mailto:rose-bags@gmail.com">rose-bags@gmail.com</a>
-      </footer>
-
-      <div className={`cart-backdrop ${cartOpen ? 'open' : ''}`} onClick={() => setCartOpen(false)} aria-hidden="true" />
-      <aside className={`cart-drawer ${cartOpen ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Your bag" aria-hidden={!cartOpen}>
-        <div className="drawer-head"><h2>Your Bag <span style={{ color: '#9b825d' }}>({cart.length})</span></h2><button className="drawer-close" onClick={() => setCartOpen(false)} aria-label="Close cart"><X size={20} /></button></div>
-        {cartAnnouncement && <div className="cart-confirmation" role="status" aria-live="polite" data-testid="status-cart-added"><Check size={16} /><span>{cartAnnouncement}</span><button type="button" onClick={() => setCartAnnouncement('')} aria-label="Dismiss added to bag message"><X size={14} /></button></div>}
-        <div className="drawer-items">
-          {cart.length === 0 ? <div className="empty-cart">Your bag is waiting.</div> : cart.map((item) => (
-            <div className="cart-row" key={item.key}>
-              <span className="cart-row-name">{item.name}</span><span className="cart-row-price">{money(item.price)}</span>
-              <button className="remove-item" onClick={() => setCart((items) => items.filter((entry) => entry.key !== item.key))} aria-label={`Remove ${item.name}`} data-testid={`button-remove-cart-${item.key}`}><X size={16} /></button>
-            </div>
-          ))}
-        </div>
-        {cart.length > 0 && <div className="cart-total"><span>Subtotal</span><span>{money(total)}</span></div>}
-      </aside>
+      <StoreFooter />
     </>
   );
 }
@@ -306,13 +189,19 @@ function Storefront() {
 function App() {
   return (
     <AuthProvider>
-      <Switch>
-        <Route path="/login" component={LoginPage} />
-        <Route path="/signup" component={SignUpPage} />
-        <Route path="/" component={Storefront} />
-        <Route component={NotFound} />
-      </Switch>
-      <Toaster />
+      <CartProvider>
+        <FavoritesProvider>
+          <Switch>
+            <Route path="/login" component={LoginPage} />
+            <Route path="/signup" component={SignUpPage} />
+            <Route path="/favorites" component={FavoritesPage} />
+            <Route path="/" component={Storefront} />
+            <Route component={NotFound} />
+          </Switch>
+          <CartDrawer />
+          <Toaster />
+        </FavoritesProvider>
+      </CartProvider>
     </AuthProvider>
   );
 }
