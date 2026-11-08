@@ -537,8 +537,8 @@ body { background:var(--cream); }
     align-items:flex-start;
   }
   .hero-image {
-    background-size:auto 112%;
-    background-position:59% 36%;
+    background-size:auto 100%;
+    background-position:63% 100%;
   }
   .hero-content {
     position:absolute;
@@ -609,8 +609,8 @@ body { background:var(--cream); }
     align-items:flex-start;
   }
   .hero-image {
-    background-size:auto 112%;
-    background-position:62% 36%;
+    background-size:auto 100%;
+    background-position:62% 100%;
   }
   .hero-content {
     position:absolute;
