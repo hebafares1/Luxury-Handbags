@@ -1,10 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ArrowDown, ArrowUpRight, Check, Heart, Plus, ShoppingBag, X } from 'lucide-react';
 import { getProducts } from '@workspace/api-client-react';
+import { Link, Route, Switch } from 'wouter';
+import { AuthProvider, useAuth } from '@/auth/AuthContext';
+import { LoginPage, SignUpPage } from '@/pages/auth';
+import NotFound from '@/pages/not-found';
+import { Toaster } from '@/components/ui/toaster';
 import { mapStoreProduct, type Product } from '@/data/products';
 import { ProductImageViewer } from '@/components/ProductImageViewer';
 import { HeroBackdrop } from '@/components/HeroBackdrop';
 import { convertUsdToKwd, formatStorePrice } from '@/lib/currency';
+import { supabaseClient } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
 type CartItem = { key: number; id: number; name: string; price: number };
 type StoredCart = { currency: 'KWD'; items: CartItem[] };
@@ -40,7 +47,7 @@ function readCart(): CartItem[] {
   return [];
 }
 
-function App() {
+function Storefront() {
   const [favorites, setFavorites] = useState<number[]>(() => readStorage('aura-favorites', []));
   const [cart, setCart] = useState<CartItem[]>(readCart);
   const [cartOpen, setCartOpen] = useState(false);
@@ -50,6 +57,8 @@ function App() {
   const [productsError, setProductsError] = useState(false);
   const [activeCategory, setActiveCategory] = useState('All pieces');
   const [cartAnnouncement, setCartAnnouncement] = useState('');
+  const { user, loading: authLoading } = useAuth();
+  const { toast } = useToast();
 
   const categories = ['All pieces', ...new Set(products.map((product) => product.category).filter(Boolean))];
   const visibleProducts = activeCategory === 'All pieces'
@@ -112,6 +121,28 @@ function App() {
   };
   const toggleFavorite = (id: number) => setFavorites((items) => items.includes(id) ? items.filter((item) => item !== id) : [...items, id]);
   const total = cart.reduce((sum, item) => sum + item.price, 0);
+  const signOut = async () => {
+    if (!supabaseClient) {
+      toast({
+        title: 'Unable to sign out',
+        description: 'Authentication is not configured.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) throw error;
+      toast({ title: 'Signed out', description: 'You have been signed out of ROSE.' });
+    } catch (error) {
+      toast({
+        title: 'Unable to sign out',
+        description: error instanceof Error ? error.message : 'Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   return (
     <>
@@ -123,9 +154,24 @@ function App() {
             <a href="#collection" data-testid="link-nav-collection">Collection</a>
             <a href="#contact" data-testid="link-nav-contact">Contact</a>
           </nav>
-          <button className="nav-cart" onClick={() => setCartOpen(true)} aria-label={`Open cart, ${cart.length} items`} data-testid="button-open-cart">
-            <ShoppingBag size={18} strokeWidth={1.5} /><span>Bag</span><span className="cart-count">{cart.length}</span>
-          </button>
+          <div className="nav-actions">
+            {authLoading ? (
+              <span className="nav-auth-placeholder" aria-hidden="true" />
+            ) : user?.email ? (
+              <div className="nav-user-controls">
+                <span className="nav-user-email" title={user.email} data-testid="text-user-email">{user.email}</span>
+                <button className="nav-auth-link nav-logout" type="button" onClick={() => void signOut()} data-testid="button-auth-logout">Log out</button>
+              </div>
+            ) : (
+              <div className="nav-auth-links">
+                <Link href="/login" className="nav-auth-link" data-testid="link-login">Log in</Link>
+                <Link href="/signup" className="nav-auth-link" data-testid="link-signup">Sign up</Link>
+              </div>
+            )}
+            <button className="nav-cart" onClick={() => setCartOpen(true)} aria-label={`Open cart, ${cart.length} items`} data-testid="button-open-cart">
+              <ShoppingBag size={18} strokeWidth={1.5} /><span>Bag</span><span className="cart-count">{cart.length}</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -254,6 +300,20 @@ function App() {
         {cart.length > 0 && <div className="cart-total"><span>Subtotal</span><span>{money(total)}</span></div>}
       </aside>
     </>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <Switch>
+        <Route path="/login" component={LoginPage} />
+        <Route path="/signup" component={SignUpPage} />
+        <Route path="/" component={Storefront} />
+        <Route component={NotFound} />
+      </Switch>
+      <Toaster />
+    </AuthProvider>
   );
 }
 

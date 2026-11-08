@@ -27,8 +27,17 @@ if (!basePath) {
   );
 }
 
+const supabaseUrl = process.env.SUPABASE_URL ?? '';
+const supabasePublishableKey = process.env.SUPABASE_PUBLISHABLE_KEY ?? '';
+
 export default defineConfig({
   base: basePath,
+  define: {
+    __ROSE_SUPABASE_CONFIG__: JSON.stringify({
+      url: supabaseUrl,
+      publishableKey: supabasePublishableKey,
+    }),
+  },
   plugins: [
     react(),
     tailwindcss(),
