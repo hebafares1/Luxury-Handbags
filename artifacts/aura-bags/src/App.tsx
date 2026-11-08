@@ -164,7 +164,6 @@ function Storefront() {
                 <>
                   <ProductImageViewer key={selected.id} product={selected} />
                   <aside className="viewer-details">
-                    <span className="detail-kicker">Selected piece</span>
                     <h3>{selected.name}</h3>
                     <span className="price">{money(selected.price)}</span>
                     <button className="viewer-add" onClick={() => addToCart(selected)} data-testid="button-add-selected">Add to Bag <Plus size={15} /></button>
