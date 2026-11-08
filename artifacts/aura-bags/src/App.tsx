@@ -158,7 +158,6 @@ function Storefront() {
           <div className="section-wrap">
             <div className="viewer-heading reveal">
               <div><div className="eyebrow">A closer look</div><h2 className="serif">See It From<br />Every Angle</h2></div>
-              <div className="viewer-label">An object in motion · Drag to rotate</div>
             </div>
             <div className="viewer-panel reveal">
               {selected ? (

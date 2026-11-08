@@ -119,7 +119,7 @@ export function ProductImageViewer({ product }: { product: Product }) {
       </div>
       {!ready && !failed && (
         <div className="sequence-loading" role="status">
-          <span><LoaderCircle className="sequence-spinner" size={14} /> Loading 360° view · {loaded}/{frames.length}</span>
+          <span><LoaderCircle className="sequence-spinner" size={14} /> Loading 360° view</span>
           <progress value={loaded} max={frames.length} aria-label="Loading rotation images" />
         </div>
       )}
@@ -129,8 +129,7 @@ export function ProductImageViewer({ product }: { product: Product }) {
           <button type="button" onClick={() => setRetry((value) => value + 1)}><RefreshCw size={13} /> Retry</button>
         </div>
       )}
-      <div className="stage-caption">ROSE / {product.name.replace('The ', '')} · AI views</div>
-      {ready && <span className="sequence-frame-count" aria-label={`Frame ${frame + 1} of ${frames.length}`}>{String(frame + 1).padStart(2, '0')} / {frames.length}</span>}
+      <div className="stage-caption">ROSE / {product.name.replace('The ', '')}</div>
       <div className="stage-controls">
         <button type="button" className="round-control" disabled={!ready} onClick={() => step(-1)} aria-label="Rotate left"><ArrowLeft size={15} /></button>
         <button type="button" className="round-control" disabled={!ready} onClick={() => setPlaying((value) => !value)} aria-label={playing ? 'Pause auto rotation' : 'Play auto rotation'} aria-pressed={playing}>{playing ? <Pause size={14} /> : <Play size={14} />}</button>
