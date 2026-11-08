@@ -42,3 +42,45 @@ mtime_ms = 1793666054060
 storage_uri = "gcs://replit-rams-assets-pike/rams/assets/repl:b931845e-3ca2-4e87-ab13-8400a9756a53/b6a16a1b-d51b-46c5-8b7a-baff40145e56/a5489665-00a7-401c-ae09-aadcb681e636"
 storage_version_token = "1793666087396322"
 content_type = "image/jpeg"
+
+[[outputs]]
+id = "w-ylhHb-lke9rCIpcwg39"
+uri = "file://attached_assets/generated_images/rose-product-concepts/the-noura.jpg"
+type = "image"
+title = "The Noura — concept preview"
+description = "AI-generated product concept only, not added to the ROSE store. Suggested category: Evening Clutch · Suggested price: KWD 44.000."
+logical_id = "48cd684e-99a1-4ba3-b1a4-34fb5f41c625"
+content_hash = "sha256:ef1beed0d513fe769a7d0f429f28383e48efa9f672e5fc611439b2b39b8180a6"
+size = 109378
+mtime_ms = 1794162145061
+storage_uri = "gcs://replit-rams-assets-pike/rams/assets/repl:b931845e-3ca2-4e87-ab13-8400a9756a53/48cd684e-99a1-4ba3-b1a4-34fb5f41c625/fc8bda7f-6f39-4f3e-850e-1a031b035b25"
+storage_version_token = "1794162169696733"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "hO1myBwBsYOQsfouwjbTI"
+uri = "file://attached_assets/generated_images/rose-product-concepts/the-esme.jpg"
+type = "image"
+title = "The Esme — concept preview"
+description = "AI-generated product concept only, not added to the ROSE store. Suggested category: Hobo · Suggested price: KWD 52.000."
+logical_id = "805dd591-80df-45bb-a2c6-d3f8af37326f"
+content_hash = "sha256:0c2028ebfc138b2f3ffafc4456753bc3d008fc43b2aefaa2b0e394e7a1f563ad"
+size = 88324
+mtime_ms = 1794162144825
+storage_uri = "gcs://replit-rams-assets-pike/rams/assets/repl:b931845e-3ca2-4e87-ab13-8400a9756a53/805dd591-80df-45bb-a2c6-d3f8af37326f/dfbfae40-bdee-4bf5-a39a-2634ca713a06"
+storage_version_token = "1794162171091939"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "PDseeGx8835G9yanOdUBt"
+uri = "file://attached_assets/generated_images/rose-product-concepts/the-lune.jpg"
+type = "image"
+title = "The Lune — concept preview"
+description = "AI-generated product concept only, not added to the ROSE store. Suggested category: Mini Bowling · Suggested price: KWD 48.000."
+logical_id = "e0e4a92a-f29f-4706-bdf2-ea4c7ff0b933"
+content_hash = "sha256:4f10e89d50249e25cc31143ca227c2eab41155b7a00cb1ed16f42b088998a87d"
+size = 80249
+mtime_ms = 1794162144713
+storage_uri = "gcs://replit-rams-assets-pike/rams/assets/repl:b931845e-3ca2-4e87-ab13-8400a9756a53/e0e4a92a-f29f-4706-bdf2-ea4c7ff0b933/4ea78bac-97f3-4727-a8c1-e8be2acb7a3f"
+storage_version_token = "1794162172368046"
+content_type = "image/jpeg"
