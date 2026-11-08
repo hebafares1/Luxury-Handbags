@@ -9,12 +9,20 @@ export interface HealthStatus {
   status: string;
 }
 
+export type StoreProductCurrency = typeof StoreProductCurrency[keyof typeof StoreProductCurrency];
+
+
+export const StoreProductCurrency = {
+  KWD: 'KWD',
+} as const;
+
 export interface StoreProduct {
   id: number;
   slug: string;
   name: string;
   description: string;
   price: number;
+  currency: StoreProductCurrency;
   image: string;
   category: string;
   turntableSlug: string;

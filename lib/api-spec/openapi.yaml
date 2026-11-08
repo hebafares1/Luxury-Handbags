@@ -93,6 +93,10 @@ components:
         price:
           type: number
           format: double
+        currency:
+          type: string
+          enum:
+            - KWD
         image:
           type: string
         category:
@@ -107,6 +111,7 @@ components:
         - name
         - description
         - price
+        - currency
         - image
         - category
         - turntableSlug

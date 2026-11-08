@@ -5,6 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { StoreProductCurrency } from './storeProductCurrency';
 
 export interface StoreProduct {
   id: bigint;
@@ -12,6 +13,7 @@ export interface StoreProduct {
   name: string;
   description: string;
   price: number;
+  currency: StoreProductCurrency;
   image: string;
   category: string;
   turntableSlug: string;

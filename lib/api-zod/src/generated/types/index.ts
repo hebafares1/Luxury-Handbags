@@ -8,4 +8,5 @@
 
 export * from './healthStatus';
 export * from './storeProduct';
+export * from './storeProductCurrency';
 export * from './storeProductList';

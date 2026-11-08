@@ -17,13 +17,20 @@ router.get("/:bag/:frame", async (req, res) => {
       res.status(404).json({ error: "Frame not found" });
       return;
     }
+    if (res.destroyed) return;
     res.setHeader("Content-Type", "image/jpeg");
     res.setHeader("Cache-Control", "public, max-age=3600");
     res.setHeader("X-Content-Type-Options", "nosniff");
     const stream = file.createReadStream();
-    res.on("close", () => stream.destroy());
+    res.once("close", () => {
+      if (!res.writableFinished) {
+        stream.unpipe(res);
+        stream.resume();
+      }
+    });
     stream.on("error", (error) => {
       req.log.error({ err: error, bag, frame }, "Product frame stream failed");
+      if (res.destroyed) return;
       if (!res.headersSent) res.status(503).json({ error: "Frame temporarily unavailable" });
       else res.destroy();
     });

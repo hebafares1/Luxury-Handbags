@@ -31,6 +31,7 @@ export const GetProductsResponseItem = zod.object({
   "name": zod.string(),
   "description": zod.string(),
   "price": zod.number(),
+  "currency": zod.enum(['KWD']),
   "image": zod.string(),
   "category": zod.string(),
   "turntableSlug": zod.string(),

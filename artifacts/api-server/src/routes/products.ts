@@ -23,7 +23,7 @@ router.get("/products", async (req, res): Promise<void> => {
     const url = new URL("/rest/v1/products", supabaseUrl);
     url.searchParams.set(
       "select",
-      "id,slug,name,description,price,image,category,turntable_slug,sort_order",
+      "id,slug,name,description,price,currency,image,category,turntable_slug,sort_order",
     );
     url.searchParams.set("is_active", "eq.true");
     url.searchParams.set("order", "sort_order.asc");
@@ -56,6 +56,7 @@ router.get("/products", async (req, res): Promise<void> => {
         name: value.name,
         description: value.description,
         price: Number(value.price),
+        currency: value.currency,
         image: value.image,
         category: value.category,
         turntableSlug: value.turntable_slug,
