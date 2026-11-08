@@ -124,7 +124,7 @@ function App() {
             <a href="#contact" data-testid="link-nav-contact">Contact</a>
           </nav>
           <button className="nav-cart" onClick={() => setCartOpen(true)} aria-label={`Open cart, ${cart.length} items`} data-testid="button-open-cart">
-            <ShoppingBag size={16} strokeWidth={1.5} /><span>Bag</span><span className="cart-count">{cart.length}</span>
+            <ShoppingBag size={18} strokeWidth={1.5} /><span>Bag</span><span className="cart-count">{cart.length}</span>
           </button>
         </div>
       </header>
@@ -134,7 +134,7 @@ function App() {
           <HeroBackdrop />
           <div className="hero-content">
             <h1>Carry<br /><em>Your Story</em></h1>
-            <a className="hero-cta" href="#collection" data-testid="link-shop-collection">Shop now <ArrowUpRight size={15} strokeWidth={1.6} /></a>
+            <a className="hero-cta" href="#collection" data-testid="link-shop-collection"><span className="hero-cta-label">Shop now</span><ArrowUpRight size={18} strokeWidth={1.6} /></a>
           </div>
         </section>
 
