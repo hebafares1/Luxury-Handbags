@@ -14,6 +14,7 @@ export function ProductImageViewer({ product }: { product: Product }) {
   const frames = useMemo(() => getProductFrames(product), [product]);
   const preloadedImages = useRef<HTMLImageElement[]>([]);
   const drag = useRef<{ x: number; frame: number; pointerId: number } | null>(null);
+  const hasRotation = frames.length > 1;
   const ready = loaded === frames.length && !failed;
 
   useEffect(() => {
@@ -54,12 +55,12 @@ export function ProductImageViewer({ product }: { product: Product }) {
   }, [frames, retry]);
 
   useEffect(() => {
-    if (!playing || !ready || dragging) return;
+    if (!playing || !ready || dragging || !hasRotation) return;
     const timer = window.setInterval(() => {
       setFrame((current) => wrapFrame(current + 1, frames.length));
     }, 240);
     return () => window.clearInterval(timer);
-  }, [playing, ready, dragging, frames.length]);
+  }, [playing, ready, dragging, frames.length, hasRotation]);
 
   const release = () => {
     if (!drag.current) return;
@@ -68,7 +69,7 @@ export function ProductImageViewer({ product }: { product: Product }) {
   };
 
   const step = (amount: number) => {
-    if (!ready) return;
+    if (!ready || !hasRotation) return;
     setPlaying(false);
     setFrame((current) => wrapFrame(current + amount, frames.length));
   };
@@ -76,10 +77,12 @@ export function ProductImageViewer({ product }: { product: Product }) {
   return (
     <div className="stage">
       <div
-        className={`viewer-image-interaction ${dragging ? 'is-dragging' : ''}`}
+        className={`viewer-image-interaction ${dragging ? 'is-dragging' : ''}${hasRotation ? '' : ' is-static'}`}
         tabIndex={0}
         role="group"
-        aria-label={`${product.name} 360 degree view. Drag left or right, or use the arrow keys to rotate.`}
+        aria-label={hasRotation
+          ? `${product.name} 360 degree view. Drag left or right, or use the arrow keys to rotate.`
+          : `Product image for ${product.name}.`}
         aria-busy={!ready && !failed}
         onKeyDown={(event) => {
           if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
@@ -95,7 +98,7 @@ export function ProductImageViewer({ product }: { product: Product }) {
           }
         }}
         onPointerDown={(event) => {
-          if (!ready || !event.isPrimary || event.button !== 0) return;
+          if (!ready || !hasRotation || !event.isPrimary || event.button !== 0) return;
           drag.current = { x: event.clientX, frame, pointerId: event.pointerId };
           setPlaying(false);
           setDragging(true);
@@ -113,13 +116,13 @@ export function ProductImageViewer({ product }: { product: Product }) {
         <img
           className="viewer-product-image"
           src={ready ? frames[frame] : product.image}
-          alt={`${product.name}, ${ready ? frame * 15 : 0} degree view`}
+          alt={hasRotation ? `${product.name}, ${ready ? frame * 15 : 0} degree view` : product.name}
           draggable={false}
         />
       </div>
       {!ready && !failed && (
         <div className="sequence-loading" role="status">
-          <span><LoaderCircle className="sequence-spinner" size={14} /> Loading 360° view</span>
+          <span><LoaderCircle className="sequence-spinner" size={14} /> {hasRotation ? 'Loading 360° view' : 'Loading product image'}</span>
           <progress value={loaded} max={frames.length} aria-label="Loading rotation images" />
         </div>
       )}
@@ -130,11 +133,13 @@ export function ProductImageViewer({ product }: { product: Product }) {
         </div>
       )}
       <div className="stage-caption">ROSE / {product.name.replace('The ', '')}</div>
-      <div className="stage-controls">
-        <button type="button" className="round-control" disabled={!ready} onClick={() => step(-1)} aria-label="Rotate left"><ArrowLeft size={15} /></button>
-        <button type="button" className="round-control" disabled={!ready} onClick={() => setPlaying((value) => !value)} aria-label={playing ? 'Pause auto rotation' : 'Play auto rotation'} aria-pressed={playing}>{playing ? <Pause size={14} /> : <Play size={14} />}</button>
-        <button type="button" className="round-control" disabled={!ready} onClick={() => step(1)} aria-label="Rotate right"><ArrowRight size={15} /></button>
-      </div>
+      {hasRotation && (
+        <div className="stage-controls">
+          <button type="button" className="round-control" disabled={!ready} onClick={() => step(-1)} aria-label="Rotate left"><ArrowLeft size={15} /></button>
+          <button type="button" className="round-control" disabled={!ready} onClick={() => setPlaying((value) => !value)} aria-label={playing ? 'Pause auto rotation' : 'Play auto rotation'} aria-pressed={playing}>{playing ? <Pause size={14} /> : <Play size={14} />}</button>
+          <button type="button" className="round-control" disabled={!ready} onClick={() => step(1)} aria-label="Rotate right"><ArrowRight size={15} /></button>
+        </div>
+      )}
     </div>
   );
 }
