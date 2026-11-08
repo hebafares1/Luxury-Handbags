@@ -133,14 +133,11 @@ function App() {
 
       <main>
         <section className="hero" id="home">
-          {heroProduct && <HeroScrub product={heroProduct} />}
+          {heroProduct ? <HeroScrub product={heroProduct} /> : <div className="hero-image" aria-hidden="true" />}
           <div className="hero-content">
-            <div className="eyebrow">The ROSE collection · A study in everyday</div>
             <h1>Carry<br /><em>Your Story</em></h1>
-            <p className="hero-intro">A little unexpected. A lot yourself.<br />Meet the bag that goes everywhere.</p>
-            <a className="hero-cta" href="#collection" data-testid="link-shop-collection">Explore the collection <ArrowUpRight size={15} strokeWidth={1.6} /></a>
+            <a className="hero-cta" href="#collection" data-testid="link-shop-collection">Shop now <ArrowUpRight size={15} strokeWidth={1.6} /></a>
           </div>
-          <div className="hero-index"><span className="hero-caption">A distinct point of view</span><span /> ROSE / 01</div>
         </section>
 
         <section className="collection-section" id="collection">

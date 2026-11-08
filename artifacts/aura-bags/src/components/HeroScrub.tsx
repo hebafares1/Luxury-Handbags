@@ -135,10 +135,14 @@ export function HeroScrub({ product }: HeroScrubProps) {
         draggable={false}
         fetchPriority="high"
       />
-      {sequenceReady && !reducedMotion && (
+      {!reducedMotion && (
         <div className="hero-scrub-caption" aria-hidden="true">
-          <span>SCROLL TO ROTATE · THE SLOANE</span>
-          <span className="hero-frame-count">{String(frame + 1).padStart(2, '0')} / {frames.length}</span>
+          <span className="hero-scroll-label">{sequenceReady ? 'SCROLL TO ROTATE' : ''}</span>
+          <span className="hero-frame-count">
+            {String(frame + 1).padStart(2, '0')}
+            <span className="hero-frame-rule" />
+            {String(frames.length).padStart(2, '0')}
+          </span>
         </div>
       )}
     </div>
