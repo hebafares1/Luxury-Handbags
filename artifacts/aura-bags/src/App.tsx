@@ -55,8 +55,6 @@ function App() {
   const visibleProducts = activeCategory === 'All pieces'
     ? products
     : products.filter((product) => product.category === activeCategory);
-  const heroProduct = products.find((product) => product.name === 'The Sloane');
-
   useEffect(() => { localStorage.setItem('aura-favorites', JSON.stringify(favorites)); }, [favorites]);
   useEffect(() => {
     const storedCart: StoredCart = { currency: 'KWD', items: cart };
@@ -123,7 +121,7 @@ function App() {
           <nav className="nav-links" aria-label="Main navigation">
             <a href="#home" data-testid="link-nav-home">Home</a>
             <a href="#collection" data-testid="link-nav-collection">Collection</a>
-            <a href="#story" data-testid="link-nav-story">Our story</a>
+            <a href="#contact" data-testid="link-nav-contact">Contact</a>
           </nav>
           <button className="nav-cart" onClick={() => setCartOpen(true)} aria-label={`Open cart, ${cart.length} items`} data-testid="button-open-cart">
             <ShoppingBag size={16} strokeWidth={1.5} /><span>Bag</span><span className="cart-count">{cart.length}</span>
@@ -133,7 +131,7 @@ function App() {
 
       <main>
         <section className="hero" id="home">
-          {heroProduct ? <HeroScrub product={heroProduct} /> : <div className="hero-image" aria-hidden="true" />}
+          <HeroScrub />
           <div className="hero-content">
             <h1>Carry<br /><em>Your Story</em></h1>
             <a className="hero-cta" href="#collection" data-testid="link-shop-collection">Shop now <ArrowUpRight size={15} strokeWidth={1.6} /></a>

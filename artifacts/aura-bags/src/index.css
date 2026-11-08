@@ -443,3 +443,49 @@ html { scroll-padding-top: 90px; }
   .hero-visual { top:0; right:0; bottom:0; left:0; }
   .hero-product-image { object-position:left center; }
 }
+
+/* Use the original lifestyle photo from the reference without image filters. */
+.hero-image {
+  background-image:url('/aura-hero.jpg');
+  background-position:center 53%;
+  background-size:cover;
+  transform:scale(1);
+  animation:none;
+  filter:none;
+  will-change:transform;
+}
+.hero-index {
+  z-index:2;
+  right:7.2vw;
+  bottom:34px;
+  gap:13px;
+  color:#72675b;
+  text-shadow:none;
+}
+.hero-index span.hero-index-number {
+  display:block;
+  width:auto;
+  height:auto;
+  background:none;
+  font-variant-numeric:tabular-nums;
+}
+.hero-index span.hero-index-rule {
+  display:block;
+  width:52px;
+  height:1px;
+  background:rgba(25,24,23,.3);
+}
+@media(max-width:850px) {
+  .hero-image { background-position:61% center; }
+}
+@media(max-width:600px) {
+  .hero { height:69.5svh; min-height:520px; max-height:650px; margin-bottom:18svh; }
+  .hero-content { margin-top:15px; }
+  .hero-image { background-position:62% bottom; }
+  .hero-index { right:22px; bottom:24px; gap:9px; font-size:8px; }
+  .hero-index span.hero-index-rule { width:60px; }
+  .nav-cart > span:not(.cart-count) { display:none; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .hero-image { animation:none; transform:none; }
+}

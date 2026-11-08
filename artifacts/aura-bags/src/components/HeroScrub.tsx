@@ -1,18 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { getProductFrames, type Product } from '@/data/products';
 
 gsap.registerPlugin(ScrollTrigger);
 
-type HeroScrubProps = { product: Product };
-
-export function HeroScrub({ product }: HeroScrubProps) {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const frames = useMemo(() => getProductFrames(product), [product]);
-  const [sequenceReady, setSequenceReady] = useState(false);
-  const [frame, setFrame] = useState(0);
+export function HeroScrub() {
+  const imageRef = useRef<HTMLDivElement>(null);
+  const [step, setStep] = useState(1);
   const [reducedMotion, setReducedMotion] = useState(
     () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   );
@@ -25,67 +19,10 @@ export function HeroScrub({ product }: HeroScrubProps) {
   }, []);
 
   useEffect(() => {
-    let cancelled = false;
-    const images: HTMLImageElement[] = [];
-    const timeouts: number[] = [];
-    setSequenceReady(false);
-    setFrame(0);
+    const image = imageRef.current;
+    const hero = image?.closest<HTMLElement>('.hero');
+    if (reducedMotion || !image || !hero) return;
 
-    if (reducedMotion) return;
-
-    let settled = 0;
-    let failed = false;
-    const finish = (success: boolean) => {
-      if (cancelled) return;
-      settled += 1;
-      failed ||= !success;
-      if (failed) {
-        setSequenceReady(false);
-        return;
-      }
-      if (settled === frames.length) setSequenceReady(true);
-    };
-
-    frames.forEach((src) => {
-      const image = new Image();
-      images.push(image);
-      const timeout = window.setTimeout(() => finish(false), 20000);
-      timeouts.push(timeout);
-      let imageSettled = false;
-      const complete = (success: boolean) => {
-        if (imageSettled) return;
-        imageSettled = true;
-        window.clearTimeout(timeout);
-        finish(success);
-      };
-      image.onload = () => {
-        if (typeof image.decode === 'function') {
-          image.decode().then(() => complete(true)).catch(() => complete(false));
-        } else {
-          complete(true);
-        }
-      };
-      image.onerror = () => complete(false);
-      image.src = src;
-      if (image.complete && image.naturalWidth > 0) complete(true);
-    });
-
-    return () => {
-      cancelled = true;
-      timeouts.forEach((timeout) => window.clearTimeout(timeout));
-      images.forEach((image) => {
-        image.onload = null;
-        image.onerror = null;
-        image.src = '';
-      });
-    };
-  }, [frames, reducedMotion]);
-
-  useEffect(() => {
-    if (!sequenceReady || reducedMotion || !sectionRef.current) return;
-    const hero = sectionRef.current.closest<HTMLElement>('.hero');
-    if (!hero) return;
-    const playhead = { frame: 0 };
     const context = gsap.context(() => {
       const timeline = gsap.timeline({
         scrollTrigger: {
@@ -97,54 +34,33 @@ export function HeroScrub({ product }: HeroScrubProps) {
           pinSpacing: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            const nextStep = Math.min(6, Math.floor(self.progress * 6) + 1);
+            setStep((current) => current === nextStep ? current : nextStep);
+          },
         },
       });
-      timeline.to(playhead, {
-        frame: frames.length - 1,
-        ease: 'none',
-        onUpdate: () => setFrame(Math.round(playhead.frame)),
-      }, 0);
-      timeline.to(sectionRef.current, {
-        scale: () => window.innerWidth < 600 ? 1.4 : 1.68,
+      timeline.to(image, {
+        scale: () => window.innerWidth < 600 ? 1.18 : 1.32,
         transformOrigin: '73% 52%',
         ease: 'none',
       }, 0);
-      const heroContent = hero.querySelector<HTMLElement>('.hero-content');
-      if (heroContent) {
-        timeline.to(heroContent, {
-          x: () => window.innerWidth < 600 ? '-82vw' : '-70vw',
-          opacity: 0,
-          ease: 'none',
-        }, 0.24);
-      }
-      const heroIndex = hero.querySelector<HTMLElement>('.hero-index');
-      if (heroIndex) timeline.to(heroIndex, { opacity: 0, ease: 'none' }, 0.18);
     }, hero);
-    ScrollTrigger.refresh();
 
+    ScrollTrigger.refresh();
     return () => context.revert();
-  }, [frames, reducedMotion, sequenceReady]);
+  }, [reducedMotion]);
 
   return (
-    <div ref={sectionRef} className={`hero-visual ${sequenceReady && !reducedMotion ? 'is-scrubbable' : ''}`}>
-      <img
-        ref={imageRef}
-        className="hero-product-image"
-        src={sequenceReady && !reducedMotion ? frames[frame] : product.image}
-        alt={product.name}
-        draggable={false}
-        fetchPriority="high"
-      />
+    <>
+      <div ref={imageRef} className="hero-image" aria-hidden="true" />
       {!reducedMotion && (
-        <div className="hero-scrub-caption" aria-hidden="true">
-          <span className="hero-scroll-label">{sequenceReady ? 'SCROLL TO ROTATE' : ''}</span>
-          <span className="hero-frame-count">
-            {String(frame + 1).padStart(2, '0')}
-            <span className="hero-frame-rule" />
-            {String(frames.length).padStart(2, '0')}
-          </span>
+        <div className="hero-index" aria-hidden="true">
+          <span className="hero-index-number">{String(step).padStart(2, '0')}</span>
+          <span className="hero-index-rule" />
+          <span className="hero-index-number">06</span>
         </div>
       )}
-    </div>
+    </>
   );
 }
