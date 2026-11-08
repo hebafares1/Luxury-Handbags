@@ -3,7 +3,7 @@ import { ArrowDown, ArrowUpRight, Check, Heart, Plus, ShoppingBag, X } from 'luc
 import { getProducts } from '@workspace/api-client-react';
 import { mapStoreProduct, type Product } from '@/data/products';
 import { ProductImageViewer } from '@/components/ProductImageViewer';
-import { HeroScrub } from '@/components/HeroScrub';
+import { HeroBackdrop } from '@/components/HeroBackdrop';
 import { convertUsdToKwd, formatStorePrice } from '@/lib/currency';
 
 type CartItem = { key: number; id: number; name: string; price: number };
@@ -131,7 +131,7 @@ function App() {
 
       <main>
         <section className="hero" id="home">
-          <HeroScrub />
+          <HeroBackdrop />
           <div className="hero-content">
             <h1>Carry<br /><em>Your Story</em></h1>
             <a className="hero-cta" href="#collection" data-testid="link-shop-collection">Shop now <ArrowUpRight size={15} strokeWidth={1.6} /></a>
