@@ -17,6 +17,37 @@ out-tsc
 # dependencies
 node_modules
 
+# Environment files and credentials
+.env
+.env.*
+!.env.example
+*.env
+
+# Private keys and certificate containers
+*.pem
+*.key
+*.p8
+*.der
+*.p12
+*.pfx
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+
+# Common cloud and service credential files
+credentials.json
+credentials.*.json
+secrets.json
+secrets.*.json
+service-account*.json
+*-service-account.json
+firebase-adminsdk-*.json
+.netrc
+.pypirc
+**/.aws/credentials
+**/.config/gcloud/application_default_credentials.json
+
 # IDEs and editors
 /.idea
 .project
