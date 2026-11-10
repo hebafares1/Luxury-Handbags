@@ -1,31 +1,8 @@
-type VercelRequest = {
-  method?: string;
-};
-
-type VercelResponse = {
-  setHeader(name: string, value: string): unknown;
-  status(code: number): VercelResponse;
-  json(body: unknown): unknown;
-};
-
-type StoreProduct = {
-  id: number;
-  slug: string;
-  name: string;
-  description: string;
-  price: number;
-  currency: "KWD";
-  image: string;
-  category: string;
-  turntableSlug: string;
-  sortOrder: number;
-};
-
-function isRecord(value: unknown): value is Record<string, unknown> {
+function isRecord(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function mapProduct(value: unknown): StoreProduct {
+function mapProduct(value) {
   if (!isRecord(value)) {
     throw new Error("Supabase returned an invalid product row");
   }
@@ -58,13 +35,10 @@ function mapProduct(value: unknown): StoreProduct {
     throw new Error("Supabase returned a product with an invalid shape");
   }
 
-  return product as StoreProduct;
+  return product;
 }
 
-export default async function handler(
-  request: VercelRequest,
-  response: VercelResponse,
-): Promise<void> {
+export default async function handler(request, response) {
   if (request.method !== "GET") {
     response.setHeader("Allow", "GET");
     response.status(405).json({ error: "Method not allowed." });
@@ -103,13 +77,12 @@ export default async function handler(
       return;
     }
 
-    const rows: unknown = await result.json();
+    const rows = await result.json();
     if (!Array.isArray(rows)) {
       throw new Error("Supabase returned an unexpected product list");
     }
 
-    const products = rows.map(mapProduct);
-    response.status(200).json(products);
+    response.status(200).json(rows.map(mapProduct));
   } catch (error) {
     console.error(
       "Supabase product catalog is unavailable",
