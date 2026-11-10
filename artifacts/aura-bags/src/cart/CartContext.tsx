@@ -22,6 +22,7 @@ type CartContextValue = {
   closeCart: () => void;
   addToCart: (product: Product) => void;
   removeFromCart: (key: number) => void;
+  clearCart: () => void;
   clearAnnouncement: () => void;
 };
 
@@ -80,6 +81,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const removeFromCart = useCallback((key: number) => {
     setItems((current) => current.filter((item) => item.key !== key));
   }, []);
+  const clearCart = useCallback(() => setItems([]), []);
   const clearAnnouncement = useCallback(() => setAnnouncement(''), []);
   const total = items.reduce((sum, item) => sum + item.price, 0);
 
@@ -92,8 +94,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     closeCart,
     addToCart,
     removeFromCart,
+    clearCart,
     clearAnnouncement,
-  }), [items, isOpen, announcement, total, openCart, closeCart, addToCart, removeFromCart, clearAnnouncement]);
+  }), [items, isOpen, announcement, total, openCart, closeCart, addToCart, removeFromCart, clearCart, clearAnnouncement]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

@@ -16,6 +16,7 @@ import { ProductImageViewer } from '@/components/ProductImageViewer';
 import { HeroBackdrop } from '@/components/HeroBackdrop';
 import { formatStorePrice } from '@/lib/currency';
 import { useToast } from '@/hooks/use-toast';
+import { supabaseClient } from '@/lib/supabase';
 
 const money = formatStorePrice;
 
@@ -26,8 +27,58 @@ function Storefront() {
   const [productsError, setProductsError] = useState(false);
   const [activeCategory, setActiveCategory] = useState('All pieces');
   const { favoriteIds, pendingIds, toggleFavorite } = useFavorites();
-  const { addToCart } = useCart();
+  const { addToCart, clearCart } = useCart();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const returnUrl = new URL(window.location.href);
+    const checkoutResult = returnUrl.searchParams.get('checkout');
+    if (!checkoutResult) return;
+
+    const sessionId = returnUrl.searchParams.get('session_id');
+    returnUrl.searchParams.delete('checkout');
+    returnUrl.searchParams.delete('session_id');
+    window.history.replaceState(
+      window.history.state,
+      '',
+      `${returnUrl.pathname}${returnUrl.search}${returnUrl.hash}`,
+    );
+
+    if (checkoutResult === 'cancelled') {
+      toast({ title: 'Checkout canceled', description: 'Your bag is still saved.' });
+      return;
+    }
+
+    if (checkoutResult !== 'success' || !sessionId || !supabaseClient) {
+      toast({
+        title: 'Payment could not be verified',
+        description: 'Your bag is still saved. Please contact us if you completed payment.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    void supabaseClient.functions.invoke('create-checkout-session', {
+      body: { action: 'verify', sessionId },
+    }).then(({ data, error }) => {
+      if (error || data?.paid !== true) {
+        toast({
+          title: 'Payment is not confirmed yet',
+          description: 'Your bag is still saved. Please check your payment status.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      clearCart();
+      toast({ title: 'Thank you', description: 'Your ROSE payment was received.' });
+    }).catch(() => {
+      toast({
+        title: 'Payment could not be verified',
+        description: 'Your bag is still saved. Please contact us if you completed payment.',
+        variant: 'destructive',
+      });
+    });
+  }, [clearCart, toast]);
 
   const categories = ['All pieces', ...new Set(products.map((product) => product.category).filter(Boolean))];
   const visibleProducts = activeCategory === 'All pieces'

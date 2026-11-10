@@ -121,6 +121,8 @@ button { font: inherit; }
 .remove-item { border:0; background:transparent; cursor:pointer; color:#777; padding:10px; }
 .empty-cart { margin:auto; color:#72695f; font:400 21px 'Playfair Display',serif; }
 .cart-total { margin-top:auto; padding-top:22px; border-top:1px solid var(--line); display:flex; justify-content:space-between; font-size:11px; letter-spacing:.13em; text-transform:uppercase; }
+.cart-checkout { width:100%; margin-top:16px; }
+.cart-checkout:disabled { cursor:wait; opacity:.68; }
 .reveal { opacity:0; transform:translateY(22px); transition:opacity .75s ease,transform .75s cubic-bezier(.2,.7,.2,1); }
 .reveal.visible { opacity:1; transform:translateY(0); }
 @keyframes heroReveal { from { opacity:.45; transform:scale(1.06); } to { opacity:1; transform:scale(1.015); } }

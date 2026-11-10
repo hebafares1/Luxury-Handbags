@@ -1,4 +1,4 @@
-import { Heart, ShoppingBag, X, Check } from 'lucide-react';
+import { ArrowUpRight, Heart, ShoppingBag, X, Check } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/auth/AuthContext';
 import { useCart } from '@/cart/CartContext';
@@ -6,7 +6,7 @@ import { useFavorites } from '@/favorites/FavoritesContext';
 import { supabaseClient } from '@/lib/supabase';
 import { formatStorePrice } from '@/lib/currency';
 import { useToast } from '@/hooks/use-toast';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export function StoreHeader() {
   const { user, loading: authLoading } = useAuth();
@@ -92,6 +92,87 @@ export function CartDrawer() {
     removeFromCart,
     clearAnnouncement,
   } = useCart();
+  const { toast } = useToast();
+  const [checkoutPending, setCheckoutPending] = useState(false);
+
+  const startCheckout = async () => {
+    if (!supabaseClient || items.length === 0 || checkoutPending) {
+      if (!supabaseClient) {
+        toast({
+          title: 'Checkout is unavailable',
+          description: 'The store payment service is not configured.',
+          variant: 'destructive',
+        });
+      }
+      return;
+    }
+
+    const checkoutWindow = window.open('about:blank', '_blank');
+    if (!checkoutWindow) {
+      toast({
+        title: 'Checkout could not open',
+        description: 'Allow pop-ups for this preview, then try again.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    checkoutWindow.opener = null;
+    setCheckoutPending(true);
+    try {
+      const quantities = new Map<number, number>();
+      for (const item of items) {
+        quantities.set(item.id, (quantities.get(item.id) ?? 0) + 1);
+      }
+
+      const { data, error } = await supabaseClient.functions.invoke('create-checkout-session', {
+        body: {
+          action: 'create',
+          items: [...quantities].map(([id, quantity]) => ({ id, quantity })),
+        },
+        timeout: 20_000,
+      });
+      if (error) throw error;
+
+      const checkoutUrl = typeof data?.url === 'string' ? new URL(data.url) : null;
+      if (
+        !checkoutUrl ||
+        checkoutUrl.protocol !== 'https:' ||
+        checkoutUrl.hostname !== 'checkout.stripe.com'
+      ) {
+        throw new Error('Stripe did not return a valid checkout link.');
+      }
+
+      if (checkoutWindow.closed) {
+        throw new Error('The checkout tab was closed before it opened.');
+      }
+      checkoutWindow.location.replace(checkoutUrl.toString());
+    } catch (error) {
+      if (!checkoutWindow.closed) checkoutWindow.close();
+      let description = 'Please try again. Your bag is still saved.';
+      const context = (error as { context?: unknown } | null)?.context;
+      if (context instanceof Response) {
+        try {
+          const payload: unknown = await context.clone().json();
+          if (
+            typeof payload === 'object' &&
+            payload !== null &&
+            typeof (payload as Record<string, unknown>).error === 'string'
+          ) {
+            description = (payload as Record<string, string>).error;
+          }
+        } catch {
+          // Keep the safe generic checkout message if no JSON error is available.
+        }
+      }
+      toast({
+        title: 'Checkout could not be started',
+        description,
+        variant: 'destructive',
+      });
+    } finally {
+      setCheckoutPending(false);
+    }
+  };
 
   useEffect(() => {
     const keyHandler = (event: KeyboardEvent) => {
@@ -124,7 +205,21 @@ export function CartDrawer() {
             </div>
           ))}
         </div>
-        {items.length > 0 && <div className="cart-total"><span>Subtotal</span><span>{formatStorePrice(total)}</span></div>}
+        {items.length > 0 && (
+          <>
+            <div className="cart-total"><span>Subtotal</span><span>{formatStorePrice(total)}</span></div>
+            <button
+              className="viewer-add cart-checkout"
+              type="button"
+              onClick={() => void startCheckout()}
+              disabled={checkoutPending}
+              data-testid="button-cart-checkout"
+            >
+              <span>{checkoutPending ? 'Opening secure checkout…' : 'Checkout securely'}</span>
+              <ArrowUpRight size={16} strokeWidth={1.6} />
+            </button>
+          </>
+        )}
       </aside>
     </>
   );
